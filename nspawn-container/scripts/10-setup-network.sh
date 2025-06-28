@@ -58,10 +58,10 @@ if [ -n "${IPV6_IP}" ]; then
 fi
 
 # Make DNSMasq listen to the container network for split horizon or conditional forwarding
-if ! grep -qxF "interface=br${VLAN}.mac" /run/dnsmasq.conf.d/custom.conf; then
-  echo "interface=br${VLAN}.mac" >>/run/dnsmasq.conf.d/custom.conf
-  kill -9 "$(cat /run/dnsmasq.pid)"
-fi
+# Dnsmasq is now started with --conf-dir=/run/dnsmasq.dhcp.conf.d/ so we can drop
+# our own config files into that directory, even if they aren't related to DHCP.
+echo "interface=br${VLAN}.mac" > /run/dnsmasq.dhcp.conf.d/macvlan.conf
+kill -9 "$(cat /run/dnsmasq-main.pid)"
 
 # (optional) IPv4 force DNS (TCP/UDP 53) through DNS container
 for intfc in ${FORCED_INTFC}; do
